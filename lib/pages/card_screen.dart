@@ -13,6 +13,7 @@ class CardScreen extends StatefulWidget {
 }
 
 class _CardScreenState extends State<CardScreen> {
+  
   final user=FirebaseAuth.instance.currentUser;
   @override
   Widget build(BuildContext context) {
@@ -22,14 +23,96 @@ class _CardScreenState extends State<CardScreen> {
           Navigator.pop(context);
         }, icon: Icon(Icons.arrow_back)),
         title: 'My Card'),
-      body:ListView.builder(itemBuilder: (context, index) {
-        return Container(
+      body: StreamBuilder(stream: FirebaseFirestore.instance
+          .collection('Users')
+          .doc(user!.email).collection('card')
+          .snapshots(),
+          builder: (context, snapshot) {
+            if(snapshot.connectionState==ConnectionState.waiting){
+              return Center(child: CircularProgressIndicator(),);
+            }else{
+              return ListView.builder(itemCount: snapshot.data!.docs.length,
+                itemBuilder: (context, index) {
+                final data=snapshot.data!.docs[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal:8.0,vertical: 7),
+                    child: Container(
+                      height: 100,
+                      decoration: BoxDecoration(
+                          color: Colors.black12,
+                          borderRadius: BorderRadius.circular(20)
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal:6,),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              height: 70,
+                              width: 100,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Center(child:
+                              Image.network(data['Image']),),
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(data['Name']?? 'Default Title',style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 25
+                                ),),
+                                Text('\$${data['Price']?? 'No Price'}',style: TextStyle(
+                                    color: Colors.black54,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15
+                                ),),
+                              ],
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text('Size:35'),
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                          color: Colors.indigo,
+                                          width: 2
+                                      )
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 5,vertical: 6),
+                                    child: Center(
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.remove),
+                                          Text('1'),
+                                          Icon(Icons.add)
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },);
+            }
+          },),
 
-        );
-      },),
 
-
-
+      
       bottomNavigationBar: Container(
         height: 150,
         width: double.infinity,

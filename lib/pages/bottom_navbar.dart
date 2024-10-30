@@ -14,7 +14,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
   List<Widget>screens=[
     HomeScreen(),
     Center(child: Text('Favorite Screen'),),
-   CardScreen(),
+    CardScreen(),
     Center(child: Text('Profile Screen'),),
   ];
   @override
